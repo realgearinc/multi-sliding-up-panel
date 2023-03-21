@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="MultiSlidingUpPanelLayout">
+        <attr name="mspl_disableSliding" format="boolean" />
+        <attr name="mspl_expandThreshold" format="float" />
+        <attr name="mspl_collapseThreshold" format="float" />
+    </declare-styleable>
+</resources>
