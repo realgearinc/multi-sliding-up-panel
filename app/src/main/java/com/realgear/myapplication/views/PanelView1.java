@@ -20,7 +20,7 @@ import java.util.Random;
 public class PanelView1 extends BasePanelView {
 
     public PanelView1(@NonNull Context context, MultiSlidingUpPanelLayout panelLayout) {
-        super(context);
+        super(context, panelLayout);
 
         getContext().setTheme(R.style.Theme_SampleMultiPanel);
         LayoutInflater.from(getContext()).inflate(R.layout.panel_layout_0, this, true);

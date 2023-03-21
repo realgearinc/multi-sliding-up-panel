@@ -18,7 +18,7 @@ import java.util.Random;
 public class PanelView2 extends BasePanelView {
 
     public PanelView2(@NonNull Context context, MultiSlidingUpPanelLayout panelLayout) {
-        super(context);
+        super(context, panelLayout);
 
         getContext().setTheme(R.style.Theme_SampleMultiPanel);
         LayoutInflater.from(getContext()).inflate(R.layout.panel_layout_1, this, true);
