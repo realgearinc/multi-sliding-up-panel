@@ -1,3 +1,5 @@
+[![](https://jitpack.io/v/realgearinc/multi-sliding-up-panel.svg)](https://jitpack.io/#realgearinc/multi-sliding-up-panel)
+
 ### Android Multi Slide Up Panel
 
 This library provides an advanced way to add a multi draggable sliding up panel
