@@ -7,7 +7,7 @@ provided to see how this library is implemented.
 
 ### Demo
 
-<img src="https://github.com/realgearinc/multislidinguppanel/blob/master/src/demo.gif?raw=true" width="20%" height="25%" />
+<img src="https://github.com/realgearinc/multi-sliding-up-panel/blob/master/src/demo.gif?raw=true" width="20%" height="25%" />
 
 ### Importing the Library
 
@@ -30,7 +30,7 @@ to use the latest version:
 ```groovy
 dependencies {
     ...
-    implementation 'com.github.realgearinc:multislidinguppanel:1.0.3'
+    implementation 'com.github.realgearinc:multi-sliding-up-panel:1.2.1'
 }
 ```
 
