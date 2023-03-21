@@ -30,13 +30,13 @@ public abstract class BasePanelView extends FrameLayout implements IPanel<View> 
 
     protected float mSlope;
 
-    public BasePanelView(@NonNull Context context) {
+    public BasePanelView(@NonNull Context context, MultiSlidingUpPanelLayout panelLayout) {
         super(context);
         setClickable(true);
+        this.mParentSlidingPanel = panelLayout;
     }
 
     ////////////////////////////////// -> Abstract functions
-
     public abstract void onCreateView();
 
     public abstract void onBindView();
