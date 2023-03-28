@@ -32,7 +32,7 @@ to use the latest version:
 ```groovy
 dependencies {
     ...
-    implementation 'com.github.realgearinc:multi-sliding-up-panel:1.2.1'
+    implementation 'com.github.realgearinc:multi-sliding-up-panel:1.2.4'
 }
 ```
 

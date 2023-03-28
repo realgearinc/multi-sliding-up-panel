@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
@@ -12,10 +13,10 @@ public class Adapter {
     private MultiSlidingUpPanelLayout mSlidingUpPanelLayout;
     private List<Class<?>> mItems;
 
-    private Context mContext;
+    private AppCompatActivity mActivity;
 
-    public  Adapter(Context context, List<Class<?>> items) {
-        this.mContext = context;
+    public  Adapter(AppCompatActivity activity, List<Class<?>> items) {
+        this.mActivity = activity;
         this.mItems = items;
     }
 
@@ -23,19 +24,19 @@ public class Adapter {
         this.mSlidingUpPanelLayout = panelLayout;
     }
 
-    public MultiSlidingUpPanelLayout getSlidingUpPanelLayout() {
-        return this.mSlidingUpPanelLayout;
-    }
-
     public int getItemCount() {
         return this.mItems.size();
+    }
+
+    public AppCompatActivity getAppCompatActivity() {
+        return this.mActivity;
     }
 
     @NonNull
     public IPanel<View> onCreateSlidingPanel(int position) {
         try {
             Constructor<?> c = this.mItems.get(position).getDeclaredConstructor(Context.class, MultiSlidingUpPanelLayout.class);
-            BasePanelView panel = (BasePanelView) c.newInstance(this.mContext, this.mSlidingUpPanelLayout);
+            BasePanelView panel = (BasePanelView) c.newInstance(this.mActivity.getBaseContext(), this.mSlidingUpPanelLayout);
             panel.setFloor(position);
             panel.onCreateView();
             panel.setEnabled(true);
@@ -45,6 +46,7 @@ public class Adapter {
             throw new RuntimeException(exception);
         }
     }
+
     public void onBindView(IPanel<View> panel, int position) {
         if (getItemCount() == 0)
             return;

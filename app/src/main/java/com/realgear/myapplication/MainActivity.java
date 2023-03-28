@@ -28,6 +28,6 @@ public class MainActivity extends AppCompatActivity {
         items.add(PanelView3.class);
 
         panelLayout.setPanelStateListener(new PanelStateListener(panelLayout));
-        panelLayout.setAdapter(new Adapter(getBaseContext(), items));
+        panelLayout.setAdapter(new Adapter(this, items));
     }
 }

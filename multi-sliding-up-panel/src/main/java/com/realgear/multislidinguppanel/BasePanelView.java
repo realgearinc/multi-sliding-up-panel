@@ -12,9 +12,11 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.Lifecycle;
 
 public abstract class BasePanelView extends FrameLayout implements IPanel<View> {
-    protected MultiSlidingUpPanelLayout mParentSlidingPanel;
+    private MultiSlidingUpPanelLayout mParentSlidingPanel;
 
     @MultiSlidingUpPanelLayout.PanelState
     protected int mPanelState = MultiSlidingUpPanelLayout.COLLAPSED;
@@ -35,6 +37,15 @@ public abstract class BasePanelView extends FrameLayout implements IPanel<View> 
         setClickable(true);
         this.mParentSlidingPanel = panelLayout;
     }
+
+    public Lifecycle getLifecycle() {
+        return this.mParentSlidingPanel.getAdapter().getAppCompatActivity().getLifecycle();
+    }
+
+    public FragmentManager getSupportFragmentManager() {
+        return this.mParentSlidingPanel.getAdapter().getAppCompatActivity().getSupportFragmentManager();
+    }
+
 
     ////////////////////////////////// -> Abstract functions
     public abstract void onCreateView();
@@ -104,6 +115,11 @@ public abstract class BasePanelView extends FrameLayout implements IPanel<View> 
             default:
                 return this.getPanelExpandedHeightOffset();
         }
+    }
+
+    @Override
+    public MultiSlidingUpPanelLayout getMultiSlidingUpPanel() {
+        return this.mParentSlidingPanel;
     }
 
     @Override

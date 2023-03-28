@@ -20,6 +20,8 @@ public interface IPanel<T extends View> {
     @MultiSlidingUpPanelLayout.SlideDirection
     int getPanelSlideDirection();
 
+    MultiSlidingUpPanelLayout getMultiSlidingUpPanel();
+
     void setPanelState(@MultiSlidingUpPanelLayout.PanelState int panelState);
     void setSlideDirection(@MultiSlidingUpPanelLayout.SlideDirection int slideDirection);
     void setSlidingUpPanelRoot(MultiSlidingUpPanelLayout rootSlidingUpPanel);
