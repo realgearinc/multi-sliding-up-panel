@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Type;
 import java.util.List;
 
 public class Adapter {
@@ -67,5 +68,22 @@ public class Adapter {
             return null;
 
         return (IPanel<View>) child;
+    }
+
+    public BasePanelView getItem(Class<?> panelType) {
+        int childCount = this.mSlidingUpPanelLayout.getChildCount();
+        if (getItemCount() == 0 || childCount <= 1)
+            return null;
+
+        int index = this.mItems.indexOf(panelType);
+        if ((index + 1) > childCount)
+            return null;
+
+        View child = this.mSlidingUpPanelLayout.getChildAt(index + 1);
+
+        if (!(child instanceof BasePanelView))
+            return null;
+
+        return (BasePanelView) child;
     }
 }

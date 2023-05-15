@@ -3,6 +3,7 @@ package com.realgear.myapplication;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import com.realgear.multislidinguppanel.Adapter;
 import com.realgear.multislidinguppanel.MultiSlidingUpPanelLayout;
