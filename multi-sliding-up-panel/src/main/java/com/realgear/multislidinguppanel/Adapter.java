@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.lang.reflect.Constructor;
@@ -70,20 +71,20 @@ public class Adapter {
         return (IPanel<View>) child;
     }
 
-    public BasePanelView getItem(Class<?> panelType) {
+    public <T extends BasePanelView> T getItem(Class<T> panelType) {
         int childCount = this.mSlidingUpPanelLayout.getChildCount();
         if (getItemCount() == 0 || childCount <= 1)
             return null;
 
         int index = this.mItems.indexOf(panelType);
-        if ((index + 1) > childCount)
+        if((index + 1) > childCount)
             return null;
 
         View child = this.mSlidingUpPanelLayout.getChildAt(index + 1);
 
-        if (!(child instanceof BasePanelView))
+        if(!(child instanceof BasePanelView))
             return null;
 
-        return (BasePanelView) child;
+        return (T) child;
     }
 }
