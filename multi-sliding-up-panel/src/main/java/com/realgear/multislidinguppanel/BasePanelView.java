@@ -110,7 +110,7 @@ public abstract class BasePanelView extends FrameLayout implements IPanel<View> 
                 return (this.getPanelExpandedHeight() - this.getPanelCollapsedHeight());
 
             case MultiSlidingUpPanelLayout.EXPANDED:
-                return this.getPanelExpandedHeight();
+                return 0;
 
             default:
                 return this.getPanelExpandedHeightOffset();
