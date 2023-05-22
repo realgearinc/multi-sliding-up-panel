@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.WindowManager;
@@ -111,6 +112,9 @@ public abstract class BasePanelView extends FrameLayout implements IPanel<View> 
 
             case MultiSlidingUpPanelLayout.EXPANDED:
                 return 0;
+
+            case MultiSlidingUpPanelLayout.HIDDEN:
+                return this.getPanelExpandedHeight();
 
             default:
                 return this.getPanelExpandedHeightOffset();
