@@ -38,7 +38,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
     // External Libraries
-    implementation 'com.realgear:multi-sliding-up-panel:1.3.1'
+    //implementation 'com.realgear:multi-sliding-up-panel:1.3.1'
 
-    //implementation project (path: ':multi-sliding-up-panel')
+    implementation project (path: ':multi-sliding-up-panel')
 }
