@@ -14,11 +14,20 @@ public interface IPanel<T extends View> {
     int getPanelCollapsedHeight();
     int getPanelTopByPanelState(@MultiSlidingUpPanelLayout.PanelState int panelState);
 
+    boolean isUserHidden();
+    boolean isUserHiddenModeEnabled();
+    void disableUserHiddenMode();
+
     @MultiSlidingUpPanelLayout.PanelState
     int getPanelState();
 
+    @MultiSlidingUpPanelLayout.PanelState
+    int getPrevPanelState();
+
     @MultiSlidingUpPanelLayout.SlideDirection
     int getPanelSlideDirection();
+
+    void resetPanelRealHeight();
 
     MultiSlidingUpPanelLayout getMultiSlidingUpPanel();
 

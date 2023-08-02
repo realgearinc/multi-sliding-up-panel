@@ -6,7 +6,6 @@ import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,7 +47,9 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
     private float mExpandThreshold;
     private float mCollapseThreshold;
 
-    private Adapter mAdapter;
+    private int mPanelPrevState = -1;
+
+    private MultiSlidingPanelAdapter mAdapter;
     private IPanel<View> mSlidingPanel;
     private PanelStateListener mPanelStateListener;
 
@@ -107,7 +108,7 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
         return mCollapseThreshold;
     }
 
-    public Adapter getAdapter() {
+    public MultiSlidingPanelAdapter getAdapter() {
         return mAdapter;
     }
 
@@ -124,7 +125,7 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
         mCollapseThreshold = threshold;
     }
 
-    public void setAdapter(@NonNull Adapter adapter) {
+    public void setAdapter(@NonNull MultiSlidingPanelAdapter adapter) {
         mAdapter = adapter;
         mAdapter.setSlidingUpPanelLayout(this);
 
@@ -186,23 +187,6 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
         return expandPanel();
     }
 
-    public boolean expandPanel(@NonNull IPanel<View> panel, boolean smoothScroll) {
-        setSlidingUpPanel(panel);
-
-        if(!isFirstLayout) {
-            if(smoothScroll) {
-                return smoothSlideTo(1.0f);
-            }
-            else {
-                return mSlidingPanel.getPanelState() == COLLAPSED || isFirstLayout || smoothSlideTo(1.0f);
-            }
-        }
-        else {
-            mSlidingPanel.setPanelState(EXPANDED);
-            return true;
-        }
-    }
-
     public boolean collapsePanel() {
         if (mSlidingPanel == null)
             return false;
@@ -221,21 +205,24 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
         return collapsePanel();
     }
 
-    public boolean collapsePanel(@NonNull IPanel<View> panel, boolean smoothScroll) {
-        setSlidingUpPanel(panel);
+    public boolean hidePanel() {
+        if (mSlidingPanel == null)
+            return false;
 
-        if(!isFirstLayout) {
-            if(smoothScroll) {
-                return smoothSlideTo(0.0f);
-            }
-            else {
-                return mSlidingPanel.getPanelState() == COLLAPSED || isFirstLayout || smoothSlideTo(0.0f);
-            }
-        }
-        else {
-            mSlidingPanel.setPanelState(COLLAPSED);
+        if (isFirstLayout) {
+            mSlidingPanel.setPanelState(HIDDEN);
             return true;
         }
+
+        float offset = this.computeSlidedProgress(mSlidingPanel.getPanelTopByPanelState(HIDDEN));
+
+        return mSlidingPanel.getPanelState() == HIDDEN || isFirstLayout || smoothSlideTo(offset);
+    }
+
+    public boolean hidePanel(@NonNull IPanel<View> panel) {
+        setSlidingUpPanel(panel);
+
+        return hidePanel();
     }
 
     private boolean smoothSlideTo(float slideOffset) {
@@ -289,6 +276,10 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
             this.initialY = ev.getRawY();
         }
 
+        if (ev.getActionMasked() == MotionEvent.ACTION_DOWN) {
+            this.mPanelPrevState = mSlidingPanel.getPanelState();
+        }
+
         int action = ev.getActionMasked();
         if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
             mDragHelper.cancel();
@@ -303,6 +294,10 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
     public boolean onTouchEvent(MotionEvent ev) {
         if (!isSlidingEnabled())
             return super.onTouchEvent(ev);
+
+        if (ev.getActionMasked() == MotionEvent.ACTION_DOWN) {
+            this.mPanelPrevState = mSlidingPanel.getPanelState();
+        }
 
         if (ev.getActionMasked() == MotionEvent.ACTION_UP) {
             performClick();
@@ -583,6 +578,11 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
         }
 
         @Override
+        public void onViewCaptured(@NonNull View capturedChild, int activePointerId) {
+            super.onViewCaptured(capturedChild, activePointerId);
+        }
+
+        @Override
         public void onViewDragStateChanged(int state) {
             if (mDragHelper == null)
                 return;
@@ -597,14 +597,16 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
                             mPanelStateListener.onPanelExpanded(mSlidingPanel);
                         }
                     }
-                } else if (mSlidedOffset == 0) {
+                }
+                else if (mSlidedOffset == 0) {
                     if (mSlidingPanel.getPanelState() != COLLAPSED) {
                         mSlidingPanel.setPanelState(COLLAPSED);
                         if (mPanelStateListener != null) {
                             mPanelStateListener.onPanelCollapsed(mSlidingPanel);
                         }
                     }
-                } else if (mSlidedOffset < 0) {
+                }
+                else if (mSlidedOffset < 0) {
                     mSlidingPanel.setPanelState(HIDDEN);
                     if (mPanelStateListener != null) {
                         mPanelStateListener.onPanelHidden(mSlidingPanel);
@@ -623,6 +625,16 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
                 mPanelStateListener.onPanelSliding(mSlidingPanel, mSlidedOffset);
             }
 
+            if (mSlidingPanel.isUserHidden() && mSlidingPanel.getPrevPanelState() == HIDDEN) {
+                mSlidingPanel.disableUserHiddenMode();
+                for (int i = 1; i < getChildCount(); i++) {
+                    IPanel<View> view = (IPanel<View>) getChildAt(i);
+                    if (view != (IPanel<View>) mSlidingPanel) {
+                        view.resetPanelRealHeight();
+                    }
+                }
+            }
+
             for (int i = 1; i < getChildCount(); i++) {
                 IPanel<View> view = (IPanel<View>) getChildAt(i);
                 view.onSliding(mSlidingPanel, top, dy, mSlidedOffset);
@@ -637,6 +649,18 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
                 target = computePanelTopPosition(mSlidedOffset >= mExpandThreshold ? 1.0f : 0.0f);
             } else { // intent to collapse
                 target = computePanelTopPosition(mSlidedOffset >= mCollapseThreshold ? 1.0f : 0.0f);
+
+                if (mSlidedOffset < 0.0F) {
+                    float new_offset = mSlidedOffset * -1;
+                    int top = computePanelTopPosition(new_offset);
+
+                    int new_top = mSlidingPanel.getPanelExpandedHeight() - mSlidingPanel.getPanelCollapsedHeight();
+
+                    if (top < (new_top - ((BasePanelView)mSlidingPanel).getPeakHeight() * 0.3F)) {
+                        target = mSlidingPanel.getPanelTopByPanelState(HIDDEN);
+                        ((BasePanelView)mSlidingPanel).isHidden = true;
+                    }
+                }
             }
 
             if (mDragHelper != null) {
@@ -648,7 +672,7 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
         @Override
         public int getViewVerticalDragRange(@NonNull View child) {
             if (mSlidingPanel != null) {
-                return mSlidingPanel.getPanelExpandedHeight() - mSlidingPanel.getPanelCollapsedHeight();
+                return mSlidingPanel.getPanelExpandedHeight() - ((mSlidingPanel.isUserHiddenModeEnabled()) ? 0 : mSlidingPanel.getPanelCollapsedHeight());
             }
 
             return 0;
@@ -658,7 +682,10 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
         public int clampViewPositionVertical(@NonNull View child, int top, int dy) {
             final int collapsedTop = computePanelTopPosition(0.0f);
             final int expandedTop = computePanelTopPosition(1.0f);
-            return Math.min(Math.max(top, expandedTop), collapsedTop);
+
+            int new_top = (mSlidingPanel.isUserHiddenModeEnabled()) ? mSlidingPanel.getPanelExpandedHeight() : collapsedTop;
+
+            return Math.min(Math.max(top, expandedTop), new_top);
         }
     }
 }

@@ -29,12 +29,12 @@ public class PanelView3 extends BasePanelView {
         this.setPanelState(COLLAPSED);
         this.setSlideDirection(SLIDE_VERTICAL);
 
-        this.setPeakHeight(120);
+        this.setPeakHeight(250);
     }
 
     @Override
     public void onBindView() {
-
+        this.setUserHiddenMode(true);
     }
 
     @Override

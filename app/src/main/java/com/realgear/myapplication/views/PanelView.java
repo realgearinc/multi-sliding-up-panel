@@ -4,6 +4,7 @@ import static com.realgear.multislidinguppanel.MultiSlidingUpPanelLayout.*;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 
 import androidx.annotation.NonNull;
@@ -37,6 +38,11 @@ public class PanelView extends BasePanelView {
 
         int color = Color.argb(255, r.nextInt(256), r.nextInt(256), r.nextInt(256));
         setBackgroundColor(color);
+
+        this.setOnClickListener(v -> {
+            //hidePanel();
+            Log.i("Panel", "Panel was Clicked");
+        });
     }
 
     @Override

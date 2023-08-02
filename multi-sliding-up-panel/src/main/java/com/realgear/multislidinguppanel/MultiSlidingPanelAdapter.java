@@ -4,20 +4,18 @@ import android.content.Context;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Type;
 import java.util.List;
 
-public class Adapter {
+public class MultiSlidingPanelAdapter {
     private MultiSlidingUpPanelLayout mSlidingUpPanelLayout;
     private List<Class<?>> mItems;
 
     private AppCompatActivity mActivity;
 
-    public  Adapter(AppCompatActivity activity, List<Class<?>> items) {
+    public MultiSlidingPanelAdapter(AppCompatActivity activity, List<Class<?>> items) {
         this.mActivity = activity;
         this.mItems = items;
     }

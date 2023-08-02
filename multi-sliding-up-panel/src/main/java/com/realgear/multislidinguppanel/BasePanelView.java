@@ -22,6 +22,9 @@ public abstract class BasePanelView extends FrameLayout implements IPanel<View> 
     @MultiSlidingUpPanelLayout.PanelState
     protected int mPanelState = MultiSlidingUpPanelLayout.COLLAPSED;
 
+    @MultiSlidingUpPanelLayout.PanelState
+    protected int mPrevPanelState = MultiSlidingUpPanelLayout.COLLAPSED;
+
     @MultiSlidingUpPanelLayout.SlideDirection
     protected int mSlideDirection = MultiSlidingUpPanelLayout.SLIDE_VERTICAL;
 
@@ -33,8 +36,12 @@ public abstract class BasePanelView extends FrameLayout implements IPanel<View> 
 
     protected float mSlope;
 
+    protected boolean isHidden = false;
+    protected boolean isUserHideModeEnabled = false;
+
     public BasePanelView(@NonNull Context context, MultiSlidingUpPanelLayout panelLayout) {
         super(context);
+
         setClickable(true);
         this.mParentSlidingPanel = panelLayout;
     }
@@ -105,6 +112,26 @@ public abstract class BasePanelView extends FrameLayout implements IPanel<View> 
     }
 
     @Override
+    public int getPrevPanelState() {
+        return this.mPrevPanelState;
+    }
+
+    @Override
+    public boolean isUserHidden() {
+        return this.isHidden;
+    }
+
+    @Override
+    public boolean isUserHiddenModeEnabled() {
+        return this.isUserHideModeEnabled;
+    }
+
+    @Override
+    public void disableUserHiddenMode() {
+        this.isHidden = false;
+    }
+
+    @Override
     public int getPanelTopByPanelState(int panelState) {
         switch (panelState) {
             case MultiSlidingUpPanelLayout.COLLAPSED:
@@ -128,14 +155,33 @@ public abstract class BasePanelView extends FrameLayout implements IPanel<View> 
 
     @Override
     public void onSliding(@NonNull IPanel<View> panel, int top, int dy, float slidingOffset) {
-        if (panel != this) {
+        if (panel != this && slidingOffset >= 0.0F && !isUserHidden()) {
             int myTop = (int) (this.getPanelExpandedHeight() + this.getSlope(((BasePanelView) panel).getPanelRealHeight()) * top);
+            this.setTop(myTop);
+        }
+        else if (panel != this && ((BasePanelView)panel).getFloor() > ((BasePanelView)this).getFloor() && slidingOffset < 0.0F && !this.isUserHidden()) {
+            /*if (panel.isUserHidden() && panel.getPrevPanelState() == MultiSlidingUpPanelLayout.HIDDEN) {
+                panel.disableUserHiddenMode();
+                this.resetPanelRealHeight();
+            }*/
+            int prev_height = ((BasePanelView) panel).getPeakHeight();
+
+            int collapse_height = panel.getPanelTopByPanelState(MultiSlidingUpPanelLayout.COLLAPSED);
+            int hidden_height = panel.getPanelTopByPanelState(MultiSlidingUpPanelLayout.HIDDEN);
+
+            float total = hidden_height - collapse_height;
+            float current = top - collapse_height;
+
+            int new_top = panel.getPanelTopByPanelState(MultiSlidingUpPanelLayout.COLLAPSED) - (top - panel.getPanelTopByPanelState(MultiSlidingUpPanelLayout.COLLAPSED));
+            int myTop = (int) ((this.getPanelExpandedHeight() - getPanelCollapsedHeight()) + (prev_height * (current / total)));
             this.setTop(myTop);
         }
     }
 
     @Override
     public void setPanelState(int panelState) {
+        this.mPrevPanelState = (this.mPanelState == panelState) ? this.mPrevPanelState : this.mPanelState;
+
         this.mPanelState = panelState;
 
         if (this.mPanelState != MultiSlidingUpPanelLayout.EXPANDED) {
@@ -170,10 +216,15 @@ public abstract class BasePanelView extends FrameLayout implements IPanel<View> 
 
     public int getPanelRealHeight() {
         if (this.mRealPanelHeight == 0) {
-            this.mRealPanelHeight = getPrevPanelsHeight(this.mIndex) + this.mPeakHeight;
+            this.resetPanelRealHeight();
         }
 
         return this.mRealPanelHeight;
+    }
+
+    @Override
+    public void resetPanelRealHeight() {
+        this.mRealPanelHeight = getPrevPanelsHeight(this.getFloor()) + this.mPeakHeight;
     }
 
     private int getPrevPanelsHeight(int currentPosition) {
@@ -183,7 +234,8 @@ public abstract class BasePanelView extends FrameLayout implements IPanel<View> 
         int i = currentPosition + 1;
 
         for (; i < count; i++) {
-            maxHeight += ((BasePanelView)this.mParentSlidingPanel.getAdapter().getItem(i)).getPeakHeight();
+            BasePanelView panel = ((BasePanelView)this.mParentSlidingPanel.getAdapter().getItem(i));
+            maxHeight += (panel.isUserHidden()) ? 0 : panel.getPeakHeight();
         }
 
         return maxHeight;
@@ -201,6 +253,9 @@ public abstract class BasePanelView extends FrameLayout implements IPanel<View> 
     }
 
     ////////////////////////////////// -> Set functions
+    public void setUserHiddenMode(boolean enable) {
+        this.isUserHideModeEnabled = enable;
+    }
     public void setFloor(int floor) {
         this.mIndex = floor;
     }
@@ -216,11 +271,15 @@ public abstract class BasePanelView extends FrameLayout implements IPanel<View> 
     ////////////////////////////////// -> API functions
     @SuppressWarnings("all")
     public void expandPanel() {
-        this.mParentSlidingPanel.expandPanel(this, true);
+        this.mParentSlidingPanel.expandPanel(this);
     }
     @SuppressWarnings("all")
     public void collapsePanel() {
-        this.mParentSlidingPanel.collapsePanel(this, true);
+        this.mParentSlidingPanel.collapsePanel(this);
+    }
+    public void hidePanel() {
+        this.mParentSlidingPanel.hidePanel(this);
+        this.isHidden =  true;
     }
 
     ////////////////////////////////// -> Instance functions

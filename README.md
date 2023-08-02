@@ -32,7 +32,7 @@ to use the latest version:
 ```groovy
 dependencies {
     ...
-    implementation 'com.github.realgearinc:multi-sliding-up-panel:1.2.9'
+    implementation 'com.github.realgearinc:multi-sliding-up-panel:1.3.1'
 }
 ```
 
@@ -160,9 +160,9 @@ this.setPeakHeight(142);
     // but they all should extend the BasePanelView class with same constructors
     // You can add 1 or more then 1 panels
     
-    items.add(Panel.class);
-    items.add(Panel.class);
-    items.add(Panel.class);
+    items.add(Panel1.class);
+    items.add(Panel2.class);
+    items.add(Panel3.class);
     
     // This is to listen on all the panels you can add methods or extend the class
     panelLayout.setPanelStateListener(new PanelStateListener(panelLayout) {});
