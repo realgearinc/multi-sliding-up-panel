@@ -26,7 +26,7 @@ android {
     }
 
     publishing {
-        singleVariant("release") {
+        singleVariant("debug") {
             withSourcesJar()
             withJavadocJar()
         }
@@ -43,11 +43,11 @@ afterEvaluate {
     publishing {
         publications {
             release(MavenPublication) {
-                from components.release
+                from components.debug
 
                 groupId = "com.realgear"
                 artifactId = "multi-sliding-up-panel"
-                version = "1.3.1"
+                version = "1.3.4"
             }
         }
     }
