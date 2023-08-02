@@ -14,6 +14,7 @@ dependencyResolutionManagement {
         maven { url 'https://jitpack.io' }
     }
 }
+
 rootProject.name = "SampleMultiPanel"
 include ':app'
 include ':multi-sliding-up-panel'
