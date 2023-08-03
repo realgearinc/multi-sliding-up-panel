@@ -32,7 +32,7 @@ to use the latest version:
 ```groovy
 dependencies {
     ...
-    implementation 'com.github.realgearinc:multi-sliding-up-panel:1.3.4'
+    implementation 'com.github.realgearinc:multi-sliding-up-panel:1.3.5'
 }
 ```
 
@@ -113,7 +113,7 @@ Sample Code inside `Panel` class:
 
 ```groovy
     @Override
-    public Panel(@NonNull Context context, MultiSlidingUpPanelLayout panelLayout) {
+    public Panel1(@NonNull Context context, MultiSlidingUpPanelLayout panelLayout) {
         super(context);
     }
 
