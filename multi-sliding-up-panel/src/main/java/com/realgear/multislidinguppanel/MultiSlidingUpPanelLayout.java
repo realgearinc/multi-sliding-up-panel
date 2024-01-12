@@ -336,6 +336,15 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
         final int paddingLeft = getPaddingLeft();
         final int paddingTop = getPaddingTop();
 
+        boolean hasExpandedPanel = false;
+
+        for(int i = 0; i < mAdapter.getItemCount(); i++) {
+            if(mAdapter.getItem(i).getPanelState() == EXPANDED) {
+                hasExpandedPanel = true;
+                break;
+            }
+        }
+
         final int childCount = getChildCount();
         for (int i = 0; i < childCount; i++) {
             final View child = getChildAt(i);
@@ -369,14 +378,22 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
 
             if (child instanceof IPanel) {
                 IPanel<View> panel = (IPanel<View>) child;
-                childTop = panel.getPanelTopByPanelState(panel.getPanelState()) + getPaddingTop();
-                childBottom = childTop + (((IPanel<View>) child).getPanelExpandedHeight() - ((IPanel)child).getPanelExpandedHeightOffset());
+                if(hasExpandedPanel) {
+                    if (panel.getPanelState() == EXPANDED) {
+                        childTop = panel.getPanelTopByPanelState(EXPANDED) + getPaddingTop();
+                    } else {
+                        childTop = panel.getPanelTopByPanelState(HIDDEN) + getPaddingTop();
+                    }
+                }
+                else {
+                    childTop = panel.getPanelTopByPanelState(panel.getPanelState()) + getPaddingTop();
+                }
+                childBottom = childTop + (((IPanel<View>) child).getPanelExpandedHeight() - ((IPanel) child).getPanelExpandedHeightOffset());
 
                 child.getLayoutParams().height = childBottom - childTop;
             }
 
             child.layout(childLeft, childTop, childRight, childBottom);
-
         }
 
         isFirstLayout = false;

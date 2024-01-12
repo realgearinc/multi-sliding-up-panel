@@ -9,7 +9,7 @@ public class PanelStateListener {
         this.mPanelLayout = panelLayout;
     }
 
-    public void onPanelSliding(IPanel<View> panel, float slidingOffset) { }
+    public void onPanelSliding(IPanel<View> panel, float slidingOffset) {}
 
     @SuppressWarnings("unchecked")
     void onPanelCollapsed(IPanel<View> panel) {
@@ -49,6 +49,7 @@ public class PanelStateListener {
             }
         }
     }
+
     void onPanelHidden(IPanel<View> panel) {
         int count = this.mPanelLayout.getChildCount();
         for (int i = 1; i < count; i++) {
