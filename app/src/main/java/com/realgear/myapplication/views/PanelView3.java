@@ -29,7 +29,8 @@ public class PanelView3 extends BasePanelView {
         this.setPanelState(COLLAPSED);
         this.setSlideDirection(SLIDE_VERTICAL);
 
-        this.setPeakHeight(250);
+        this.setPeakHeight(120);
+        this.setPanelExpandedHeightOffset(this.mParentSlidingPanel.getPaddingTop());
     }
 
     @Override

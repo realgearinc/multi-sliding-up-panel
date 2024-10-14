@@ -17,7 +17,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
 
 public abstract class BasePanelView extends FrameLayout implements IPanel<View> {
-    private MultiSlidingUpPanelLayout mParentSlidingPanel;
+    protected MultiSlidingUpPanelLayout mParentSlidingPanel;
 
     @MultiSlidingUpPanelLayout.PanelState
     protected int mPanelState = MultiSlidingUpPanelLayout.COLLAPSED;
@@ -32,6 +32,7 @@ public abstract class BasePanelView extends FrameLayout implements IPanel<View> 
     protected int mRealPanelHeight;
     protected int mExpandedHeight;
     protected int mPeakHeight;
+    protected int mPeakPadding;
     protected int mIndex;
 
     protected float mSlope;
@@ -90,7 +91,7 @@ public abstract class BasePanelView extends FrameLayout implements IPanel<View> 
                 windowManager.getDefaultDisplay().getRealMetrics(dm);
             }
 
-            this.mExpandedHeight = (dm.heightPixels - (status_bar_height + navigation_bar_height));
+            this.mExpandedHeight = ((dm.heightPixels + this.mParentSlidingPanel.getNoLimitsOffset()) - (status_bar_height + navigation_bar_height));
             //Log.i("BaseSlideView", MessageFormat.format("HeightPixels {0} - (SB {1} + NB {2}) = {3}", dm.heightPixels, statusbarheight, navigationbarheight, this.mExpandedHeight));
         }
         return this.mExpandedHeight;
@@ -156,7 +157,7 @@ public abstract class BasePanelView extends FrameLayout implements IPanel<View> 
     @Override
     public void onSliding(@NonNull IPanel<View> panel, int top, int dy, float slidingOffset) {
         if (panel != this && slidingOffset >= 0.0F && !isUserHidden()) {
-            int myTop = (int) (this.getPanelExpandedHeight() + this.getSlope(((BasePanelView) panel).getPanelRealHeight()) * top);
+            int myTop = (int) ((this.getPanelExpandedHeight()) + this.getSlope(((BasePanelView) panel).getPanelRealHeight()) * top);
             this.setTop(myTop);
         }
         else if (panel != this && ((BasePanelView)panel).getFloor() > ((BasePanelView)this).getFloor() && slidingOffset < 0.0F && !this.isUserHidden()) {
@@ -170,10 +171,9 @@ public abstract class BasePanelView extends FrameLayout implements IPanel<View> 
             int hidden_height = panel.getPanelTopByPanelState(MultiSlidingUpPanelLayout.HIDDEN);
 
             float total = hidden_height - collapse_height;
-            float current = top - collapse_height;
+            float current = (top - this.mParentSlidingPanel.getPaddingTop()) - collapse_height;
 
-            int new_top = panel.getPanelTopByPanelState(MultiSlidingUpPanelLayout.COLLAPSED) - (top - panel.getPanelTopByPanelState(MultiSlidingUpPanelLayout.COLLAPSED));
-            int myTop = (int) ((this.getPanelExpandedHeight() - getPanelCollapsedHeight()) + (prev_height * (current / total)));
+            int myTop = (int) (((this.getPanelExpandedHeight() + this.mParentSlidingPanel.getPaddingTop()) - (getPanelCollapsedHeight())) + ((prev_height ) * (current / total)));
             this.setTop(myTop);
         }
     }
@@ -203,7 +203,7 @@ public abstract class BasePanelView extends FrameLayout implements IPanel<View> 
 
     ////////////////////////////////// -> Get functions
     public int getPeakHeight() {
-        return this.mPeakHeight;
+        return this.mPeakHeight - this.mPeakPadding;
     }
 
     public int getPanelExpandedHeightOffset() {
@@ -233,6 +233,8 @@ public abstract class BasePanelView extends FrameLayout implements IPanel<View> 
         int count = this.mParentSlidingPanel.getAdapter().getItemCount();
         int i = currentPosition + 1;
 
+        maxHeight = this.mParentSlidingPanel.getNoLimitsOffset();
+
         for (; i < count; i++) {
             BasePanelView panel = ((BasePanelView)this.mParentSlidingPanel.getAdapter().getItem(i));
             maxHeight += (panel.isUserHidden()) ? 0 : panel.getPeakHeight();
@@ -243,7 +245,7 @@ public abstract class BasePanelView extends FrameLayout implements IPanel<View> 
 
     public float getSlope(int viewHeight) {
         if (this.mSlope == 0)
-            this.mSlope = -1.0F * this.getPanelRealHeight() / (this.getPanelExpandedHeight() - viewHeight);
+            this.mSlope = -1.0F * (this.getPanelRealHeight() - this.mParentSlidingPanel.getPaddingTop()) / ((this.getPanelExpandedHeight() + this.mParentSlidingPanel.getPaddingTop()) - viewHeight);
 
         return this.mSlope;
     }
@@ -265,7 +267,7 @@ public abstract class BasePanelView extends FrameLayout implements IPanel<View> 
     }
 
     public void setPanelExpandedHeightOffset(int offset) {
-        this.mExpandedHeightOffset = offset;
+        this.mExpandedHeightOffset = 0;
     }
 
     ////////////////////////////////// -> API functions

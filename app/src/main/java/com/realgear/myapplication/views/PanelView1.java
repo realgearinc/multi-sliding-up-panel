@@ -32,6 +32,7 @@ public class PanelView1 extends BasePanelView {
         this.setSlideDirection(SLIDE_VERTICAL);
 
         this.setPeakHeight(120);
+        this.setPanelExpandedHeightOffset(this.mParentSlidingPanel.getPaddingTop());
     }
 
     @Override

@@ -56,6 +56,8 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
 
     private final ViewDragHelper mDragHelper;
 
+    private boolean mNoLimitsLayout;
+
     public MultiSlidingUpPanelLayout(Context context) {
         this(context, null);
     }
@@ -71,7 +73,7 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
         isSlidingEnabled = !a.getBoolean(R.styleable.MultiSlidingUpPanelLayout_mspl_disableSliding, false);
         mExpandThreshold = a.getFloat(R.styleable.MultiSlidingUpPanelLayout_mspl_expandThreshold, 0F);
         mCollapseThreshold = a.getFloat(R.styleable.MultiSlidingUpPanelLayout_mspl_collapseThreshold, 0.95F);
-        mHideThreshold = 0.75F;
+        mHideThreshold = 0.8F;
 
         a.recycle();
 
@@ -110,6 +112,10 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
         return mCollapseThreshold;
     }
 
+    public boolean isNoLimitsLayout() {
+        return this.mNoLimitsLayout;
+    }
+
     public MultiSlidingPanelAdapter getAdapter() {
         return mAdapter;
     }
@@ -119,6 +125,41 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
     }
 
     ////////////////////////////////// -> Set functions
+
+    public void enableNoLimitsLayout(boolean enabled) {
+        this.mNoLimitsLayout = enabled;
+    }
+
+    public int getNoLimitsOffset() {
+        if (!this.isNoLimitsLayout()) {
+            return 0;
+        }
+
+        return getStatusBarHeight(this.getContext()) + getNavigationBarHeight(this.getContext());
+    }
+
+    public static int getStatusBarHeight(Context context) {
+        int status_bar_height = 0;
+
+        int status_r_id = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if(status_r_id > 0)
+            status_bar_height = context.getResources().getDimensionPixelSize(status_r_id);
+
+        return  status_bar_height;
+    }
+
+
+
+    public static int getNavigationBarHeight(Context context) {
+        int navigation_bar_height = 0;
+
+        int status_r_id = context.getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+        if(status_r_id > 0)
+            navigation_bar_height = context.getResources().getDimensionPixelSize(status_r_id);
+
+        return  navigation_bar_height;
+    }
+
     public void setExpandThreshold(float threshold) {
         mExpandThreshold = threshold;
     }
@@ -244,7 +285,7 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
     }
 
     private int computePanelTopPosition(float slideOffset) {
-        return (int)(mSlidingPanel.getPanelExpandedHeightOffset() * slideOffset) + (int)((mSlidingPanel.getPanelExpandedHeight() - mSlidingPanel.getPanelCollapsedHeight()) * (1.0F - slideOffset));
+        return (int)(mSlidingPanel.getPanelExpandedHeightOffset() * slideOffset) + (int)(((mSlidingPanel.getPanelExpandedHeight() +  this.getPaddingTop()) - mSlidingPanel.getPanelCollapsedHeight()) * (1.0F - slideOffset));
     }
 
     private float computeSlidedProgress(int topPosition) {
@@ -677,7 +718,7 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
                     float new_offset = mSlidedOffset * -1;
                     int top = computePanelTopPosition(new_offset);
 
-                    int new_top = mSlidingPanel.getPanelExpandedHeight() - mSlidingPanel.getPanelCollapsedHeight();
+                    int new_top = (mSlidingPanel.getPanelExpandedHeight() + getNoLimitsOffset()) - mSlidingPanel.getPanelCollapsedHeight();
 
                     if (top < (new_top - ((BasePanelView)mSlidingPanel).getPeakHeight() * mHideThreshold)) {
                         target = mSlidingPanel.getPanelTopByPanelState(HIDDEN);
