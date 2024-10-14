@@ -47,10 +47,6 @@ public class PanelView1 extends BasePanelView {
 
     @Override
     public void onSliding(@NonNull IPanel<View> panel, int top, int dy, float slidingOffset) {
-        super.onSliding(panel, top, dy, slidingOffset);
 
-
-        // We are using the sliding progress as alpha
-        // this.setAlpha(slidingOffset);
     }
 }

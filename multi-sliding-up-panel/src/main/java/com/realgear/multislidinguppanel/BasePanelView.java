@@ -186,6 +186,7 @@ public abstract class BasePanelView extends FrameLayout implements IPanel<View> 
 
         if (this.mPanelState != MultiSlidingUpPanelLayout.EXPANDED) {
             this.mSlope = 0;
+
         }
 
         this.onPanelStateChanged(panelState);

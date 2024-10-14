@@ -285,12 +285,12 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
     }
 
     private int computePanelTopPosition(float slideOffset) {
-        return (int)(mSlidingPanel.getPanelExpandedHeightOffset() * slideOffset) + (int)(((mSlidingPanel.getPanelExpandedHeight() +  this.getPaddingTop()) - mSlidingPanel.getPanelCollapsedHeight()) * (1.0F - slideOffset));
+        return (int)(mSlidingPanel.getPanelExpandedHeightOffset() * slideOffset) + (int)(((mSlidingPanel.getPanelExpandedHeight() + this.getPaddingTop()) - mSlidingPanel.getPanelCollapsedHeight()) * (1.0F - slideOffset));
     }
 
     private float computeSlidedProgress(int topPosition) {
         final int collapsedTop = computePanelTopPosition(0);
-        return (float) (collapsedTop - topPosition) / (mSlidingPanel.getPanelExpandedHeight() - mSlidingPanel.getPanelCollapsedHeight());
+        return (float) (collapsedTop - topPosition) / ((mSlidingPanel.getPanelExpandedHeight() + this.getPaddingTop()) - mSlidingPanel.getPanelCollapsedHeight());
     }
 
     ////////////////////////////////// -> Motion/Touch events functions
