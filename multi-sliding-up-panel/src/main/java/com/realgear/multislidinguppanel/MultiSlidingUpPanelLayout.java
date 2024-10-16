@@ -374,6 +374,20 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
     @SuppressWarnings("unchecked Cast")
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        if (this.mSlidingPanel != null && this.mSlidingPanel.getPanelState() == DRAGGING) {
+            final int childCount = getChildCount();
+            for (int i = 0; i < childCount; i++) {
+                final View child = getChildAt(i);
+                int childTop = child.getTop();
+                int childBottom = child.getBottom();
+                int childLeft = child.getLeft();
+                int childRight = child.getRight();
+
+                child.layout(childLeft, childTop, childRight, childBottom);
+            }
+            return;
+        }
+
         final int paddingLeft = getPaddingLeft();
         final int paddingTop = getPaddingTop();
 
@@ -419,11 +433,12 @@ public class MultiSlidingUpPanelLayout extends ViewGroup {
 
             if (child instanceof IPanel) {
                 IPanel<View> panel = (IPanel<View>) child;
+
                 if(hasExpandedPanel) {
                     if (panel.getPanelState() == EXPANDED) {
-                        childTop = panel.getPanelTopByPanelState(EXPANDED) + getPaddingTop();
+                        childTop = panel.getPanelTopByPanelState(EXPANDED);
                     } else {
-                        childTop = panel.getPanelTopByPanelState(HIDDEN) + getPaddingTop();
+                        childTop = panel.getPanelTopByPanelState(HIDDEN);
                     }
                 }
                 else {
